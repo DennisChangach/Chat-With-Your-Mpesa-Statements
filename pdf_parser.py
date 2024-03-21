@@ -5,28 +5,30 @@ import PyPDF2
 import tabula
 import datetime
 
-def pdf_parser(pdf_password,pdf_path):
+
+#Function for decrypting the PDF
+def pdf_decrypt(pdf_password,pdf_file):
+    # Create a PDF object
+    pdf_reader = PyPDF2.PdfReader(pdf_file)
+
+    # Check if the PDF is encrypted
+    if pdf_reader.is_encrypted:
+        # Attempt to decrypt the PDF with the password
+        if pdf_reader.decrypt(pdf_password):
+            print("PDF successfully decrypted.")
+        else:
+            print("Failed to decrypt the PDF. Please check you've uploaded your statement and entered the correct password.")
+            exit(1)
+
+#Function for parsing the pdf
+def pdf_parser(pdf_password,pdf_file):
     """
     inputs: [pdf_password and pdf_path provided from the Streamlit UI]
     outputs: The function returns the cleaned pandas dataframe containing the Mpesa Transactions
     
     """
-    # Open the PDF file in binary read mode
-    with open(pdf_path, "rb") as pdf_file:
-        # Create a PDF object
-        pdf_reader = PyPDF2.PdfReader(pdf_file)
-
-        # Check if the PDF is encrypted
-        if pdf_reader.is_encrypted:
-            # Attempt to decrypt the PDF with the password
-            if pdf_reader.decrypt(pdf_password):
-                print("PDF successfully decrypted.")
-            else:
-                print("Failed to decrypt the PDF. Please check the password.")
-                exit(1)
-
     #Extracting the tables from the pdf file
-    tables = tabula.read_pdf(pdf_path, password=pdf_password, pages="all")
+    tables = tabula.read_pdf(pdf_file, password=pdf_password, pages="all")
     #Slicing the list to remove the extracted footer section: After every 2 from tables[2]: using Slicing Method
     new_table = tables[2::2]
     #concatenating all the tables in the list into one dataframe
@@ -107,7 +109,7 @@ def pdf_parser(pdf_password,pdf_path):
                 'Merchant Payment Online':'Till No',
                 'Customer Payment to Small':'Pochi',
                 'M-Shwari Withdraw':'Mshwari Withdraw',
-                'Business Payment from':'Bank Payment',
+                'Business Payment from':'Bank Transfer',
                 'Airtime Purchase':'Airtime Purchase',
                 'Funds received from':'Receive Money',
                 'Merchant Payment':'Till No',
@@ -135,7 +137,9 @@ def pdf_parser(pdf_password,pdf_path):
     #Getting the mpesa table with only the relevant details
     mpesa_df_final= mpesa_df[['Receipt No.','Account','Transaction_Type' ,
        'Paid In', 'Withdrawn', 'Balance',
-       'DayOfWeekName', 'Date', 'Time']]
+       'DayOfWeekName', 'Completion Time']]
+    #rename columns
+    mpesa_df_final.rename(columns={'Paid In': 'Money_In', 'Withdrawn': 'Money_Out'}, inplace=True)
     
     #Returning the dataframe
     return mpesa_df_final

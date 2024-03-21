@@ -12,6 +12,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.prompts import SemanticSimilarityExampleSelector
 from few_shots import few_shots
+from prompts import in_context_prompt,few_shot_prompt
 from dotenv import load_dotenv
 import os
 import uvicorn
@@ -56,50 +57,8 @@ def get_few_shot_response(input_question):
     example_selector.select_examples({"Question": "What is the total amount of money withdrawn?"})
 
 
-    my_prompt = """
-    You are a financial advisor with knowdlege analysing data using pandas. 
-    You will be provided with the columns details of a pandas data frame and you
-    should generate the result based on the user's question. The dataframe conisists of transactions
-    made by a user on Mpesa platform, which is a mobile money platform. 
-
-    Given input question, first create a syntatically correct pandas syntax and return the syntax
-    as an executable python code. 
-
-    The dataframe name is df and only use the columns in the dataframe.\n\n
-
-    Pay attention to use current_date = datetime.date.today() to get the current date, if the question involves "today".
-
-
-    The following are the column names and their descriptions:
-    'Receipt No.': Unique identifier for each mpesa transaction done. 
-    'Completion Time': The timestamp for when the transaction was completed
-    'Details': The details of the transaction
-    'Name': The Account Name for the transaction done
-    'Transaction_Type': The type of transaction; These are the type of transactions:['Mpesa Charges', 'Pay Bill', 'Bank Payment', 'Till No',
-        'Send Money', 'Airtime Purchase', 'Receive Money', 'Pochi',
-        'Other', 'M-Shwari Loan', 'Mshwari Withdraw', 'Mshwari Deposit',
-        'Cash Withdrawal', 'Customer Deposit']
-    'Paid In': The amount that was received in their Mpesa Account. 
-    'Withdrawn': the Amount that was withdrawn or sent from their account
-    'Balance': the balance remaining after the transaction was made
-
-    Here's the dataframe information: 
-    Data columns (total 8 columns):
-    #   Column            Non-Null Count  Dtype  
-    ---  ------            --------------  -----  
-    0   Receipt No.       3508 non-null   object 
-    1   Completion Time   3508 non-null   object 
-    2   Details           3508 non-null   object 
-    3   Name              3508 non-null   object 
-    4   Transaction_Type  3508 non-null   object 
-    5   Paid In           3508 non-null   float64
-    6   Withdrawn         3508 non-null   float64
-    7   Balance           3508 non-null   float64
-
-    Make sure the response follows this format: 
-    'Answer': 'df["Withdrawn"].sum()'
-
-    """
+    my_prompt = few_shot_prompt
+    
 
     PROMPT_SUFFIX = """
 
@@ -131,53 +90,8 @@ def get_in_cotext_reponse(input_question):
     #getting the few shot examples
     examples = str(few_shots)
     
-    my_prompt = """
-    You are a financial advisor with knowdlege analysing data using pandas. 
-    You will be provided with the columns details of a pandas data frame and you
-    should generate the result based on the user's question. The dataframe conisists of transactions
-    made by a user on Mpesa platform, which is a mobile money platform. 
-
-    Given input question, first create a syntatically correct pandas syntax and return the syntax
-    as an executable python code. 
-
-    The dataframe name is df and only use the columns in the dataframe.\n\n
-
-    The following are the column names and their descriptions:
-    'Receipt No.': Unique identifier for each mpesa transaction done. 
-    'Completion Time': The timestamp for when the transaction was completed
-    'Details': The details of the transaction
-    'Name': The Account Name for the transaction done
-    'Transaction_Type': The type of transaction; These are the type of transactions:['Mpesa Charges', 'Pay Bill', 'Bank Payment', 'Till No',
-        'Send Money', 'Airtime Purchase', 'Receive Money', 'Pochi',
-        'Other', 'M-Shwari Loan', 'Mshwari Withdraw', 'Mshwari Deposit',
-        'Cash Withdrawal', 'Customer Deposit']
-    'Paid In': The amount that was received in their Mpesa Account. 
-    'Withdrawn': the Amount that was withdrawn or sent from their account
-    'Balance': the balance remaining after the transaction was made
-
-
-    Here's the dataframe information: 
-        Data columns (total 8 columns):
-        #   Column            Non-Null Count  Dtype  
-        ---  ------            --------------  -----  
-        0   Receipt No.       3508 non-null   object 
-        1   Completion Time   3508 non-null   object 
-        2   Details           3508 non-null   object 
-        3   Name              3508 non-null   object 
-        4   Transaction_Type  3508 non-null   object 
-        5   Paid In           3508 non-null   float64
-        6   Withdrawn         3508 non-null   float64
-        7   Balance           3508 non-null   float64
-
-    Make sure the response follows this format: 'Answer': 'df["Withdrawn"].sum()'
-
-    You can use the following examples: {examples} to get a better context of the type of response to provide
-
-    Question: {question}\n
-
-
-    """
-    #Defining the prompt template
+    my_prompt = in_context_prompt
+  
     #Defining the prompt template
     prompt = PromptTemplate(input_variables=['question','examples'],template=my_prompt)
 

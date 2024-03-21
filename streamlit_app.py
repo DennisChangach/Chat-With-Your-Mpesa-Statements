@@ -2,21 +2,67 @@
 import streamlit as st
 import datetime as dt
 import pandas as pd
+import plotly.express as px
 import requests
+from pdf_parser import pdf_parser,pdf_decrypt
+
 
 #Defining the main function:
 def main():
     st.set_page_config("Chatting with Mpesa")
-    st.title("Chatting with my Mpesa Statements")
+    st.title("💬 Chat with Your Mpesa Statements:📊")
 
-    #Reading the CSV file
-    df = pd.read_csv('Documents\mpesa_data.csv')
+    #Decrpyt variable
+    #Side Menu Bar
+    with st.sidebar:
+        st.title("🛠️ Configuration:⚙️")
+        #Activating Demo Data
+        st.text("Turn on to use demo data")
+        demo_on = st.toggle("Use demo data: 📈")
 
-    df['Completion Time'] = pd.to_datetime(df['Completion Time'])
+    if demo_on:
+        #impprting the demo data:
+        df = pd.read_csv("Documents/mpesa_demo_data.csv")
+        st.text("Here are your transactions!💵")
+        st.dataframe(df)
+        chat_window(df)
+    
+    #Other option
+    else:
+        #Sidebar
+        #Side Menu Bar
+        with st.sidebar:
+            st.text("Use your Mpesa Statement: 📝")
+            pdf_file = st.file_uploader("Upload your Mpesa Statement",accept_multiple_files=False)
+            pdf_password = st.text_input("Enter File password",type='password')
+            #pdf_path = "\mpesa_statement_v2.pdf"
+            if st.button("Submit & Process"):
+                with st.spinner("Processing..."):
+                    try:
+                        pdf_decrypt(pdf_file=pdf_file,pdf_password=pdf_password)
+            
+                        st.success("Done")
+        
+                    except Exception as e:
+                        st.error("Failed to decrypt the PDF. Please check you've uploaded your statement and entered the correct password.")
+  
+    #Loading the dataframe
+    try:
+        if pdf_file and pdf_password:
+            df = pdf_parser(pdf_file=pdf_file,pdf_password=pdf_password)
+            st.text("Here are your transactions!💵")
+            st.dataframe(df)
+            chat_window(df)
+        else:
+            st.code("Get Started by uploading your Mpesa Statement!")
+    except Exception as e:
+        print("Failed to decrypt the PDF. Please check you've uploaded your statement and entered the correct password.")
 
+#Defining the function to Initialise the Chat Window
+def chat_window(df):
     #Chat Window
     with st.chat_message("assistant"):
-        st.write("What do you want to find out about your transactions today?")
+        st.write("What do you want to find out about your transactions today?🧐")
 
     #Initilizing message history
     if "messages" not in st.session_state:
@@ -47,9 +93,11 @@ def main():
         #Adding user question to chat history
         st.session_state.messages.append({"role":"user","question":user_question})
         
-        response = requests.post("http://localhost:8000/generate_response", json={"question": user_question})
-
-        try:
+        
+        try:           
+            #Getting response from the API end-point
+            response = requests.post("http://localhost:8000/generate_response", json={"question": user_question})
+            
             #checking if the response from the server is successful
             if response.status_code == 200:
                 #extracting the code from the JSON response
@@ -59,7 +107,30 @@ def main():
             #Adding the assistant response to chat history
             st.session_state.messages.append({"role":"assistant","code":code})
         
+        except Exception as TypeError:
+            st.write(TypeError)
+            error_message = "⚠️Error Occured! Please Submit & Process your Mpesa Statement first!"
+            #Displaying the error message
+            with st.chat_message("assistant"):  
+                st.error(error_message)
+
+            #Appending the error messaage to the session
+            st.session_state.messages.append({"role":"assistant","error":error_message})
+        
+        
+        except Exception as NameError:
+            st.write(NameError)
+            error_message = "⚠️Error Occured! Please Submit & Process your Mpesa Statement first!"
+            #Displaying the error message
+            with st.chat_message("assistant"):  
+                st.error(error_message)
+
+            #Appending the error messaage to the session
+            st.session_state.messages.append({"role":"assistant","error":error_message})
+        
+        
         except Exception as e:
+            st.write(e)
             error_message = "⚠️Error occured while fetching response from the server!"
             #Displaying the error message
             with st.chat_message("assistant"):  
@@ -67,18 +138,14 @@ def main():
 
             #Appending the error messaage to the session
             st.session_state.messages.append({"role":"assistant","error":error_message})
-
-        
-    #Side Menu Bar
-    with st.sidebar:
-        st.title("Configuration:⚙️")
     
     
     #Function to clear history
     def clear_chat_history():
         st.session_state.messages = []
     #Button for clearing history
-    st.sidebar.button("Clear Chat History",on_click=clear_chat_history)
+    st.sidebar.text("Click to Clear Chat history")
+    st.sidebar.button("CLEAR 🗑️",on_click=clear_chat_history)
 
 
 if __name__ == "__main__":
