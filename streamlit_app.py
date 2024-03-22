@@ -96,7 +96,7 @@ def chat_window(df):
         
         try:           
             #Getting response from the API end-point
-            response = requests.post("http://localhost:8000/generate_response", json={"question": user_question})
+            response = requests.post("https://chat-pesa.onrender.com/generate_response", json={"question": user_question})
             
             #checking if the response from the server is successful
             if response.status_code == 200:
@@ -146,6 +146,7 @@ def chat_window(df):
     #Button for clearing history
     st.sidebar.text("Click to Clear Chat history")
     st.sidebar.button("CLEAR 🗑️",on_click=clear_chat_history)
+    #st.sidebar.image("Documents\mpesa_img.png")
 
 
 if __name__ == "__main__":
