@@ -22,7 +22,7 @@ def main():
 
     if demo_on:
         #impprting the demo data:
-        df = pd.read_csv("Documents/mpesa_demo_data.csv")
+        df = pd.read_csv("Demo_Data/mpesa_demo_data.csv")
         st.text("Here are your transactions!💵")
         st.dataframe(df)
         chat_window(df)
