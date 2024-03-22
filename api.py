@@ -11,6 +11,7 @@ from langchain.prompts.prompt import PromptTemplate
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.prompts import SemanticSimilarityExampleSelector
+from langchain_core.output_parsers import StrOutputParser
 from few_shots import few_shots
 from prompts import in_context_prompt,few_shot_prompt
 from dotenv import load_dotenv
@@ -23,8 +24,15 @@ load_dotenv()
 # Configure the API key
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
+#Configuring Langsmith
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
+
 # Load the LLM - Gemini Pro
 llm = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
+
+#Initilializing the output parser
+output_parser = StrOutputParser()
 
 # Define FastAPI app
 app = FastAPI()
@@ -104,7 +112,7 @@ def get_in_cotext_reponse(input_question):
 
     return python_code
 
-#index route: Opens automaticaly on http://126.0.0.1:8000
+#index route: Opens automaticaly on http://127.0.0.1:8000
 @app.get('/')
 async def index():
     return {'message':'Get Started: Chatting with your Mpesa Statements'}
@@ -115,3 +123,5 @@ async def index():
 async def generate_response(input_question: InputQuestion):
     code = get_in_cotext_reponse(input_question.question)
     return {"code": code}
+
+#Run with: uvicorn api:app --reload

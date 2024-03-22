@@ -13,6 +13,7 @@ faiss-cpu==1.7.4
 protobuf
 google-generativeai
 langchain
+langchain_core
 langchain_experimental
 langchain_google_genai
 langchain_community
