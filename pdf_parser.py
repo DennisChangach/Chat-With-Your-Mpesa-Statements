@@ -37,22 +37,22 @@ def pdf_parser(pdf_password,pdf_file):
     mpesa_df = mpesa_df[mpesa_df['Transaction Status'] =='Completed']
 
     #Data Cleaning/Wrangling
-    #Deleting the unmaed column
+    #Deleting the unnamed column
     mpesa_df.drop(['Unnamed: 0'],axis=1,inplace=True)
     #removing the - from the withdrawn column
     mpesa_df['Withdrawn'] = mpesa_df['Withdrawn'].str.replace("-","")
-    #convrting the values to float by replacing the commas
+    #converting the values to float by replacing the commas
     mpesa_df['Balance'] = mpesa_df['Balance'].str.replace(",","").astype(float)
     mpesa_df['Withdrawn'] = mpesa_df['Withdrawn'].str.replace(",","").astype(float)
     mpesa_df['Paid In'] = mpesa_df['Paid In'].str.replace(",","").astype(float)
-    #converting the date column to datatime
+    #converting the date column to datetime
     mpesa_df['Completion Time'] = pd.to_datetime(mpesa_df['Completion Time'])
 
     #Filling null values with 0
     mpesa_df['Balance'].fillna(0,inplace=True)
     mpesa_df['Withdrawn'].fillna(0,inplace=True)
     mpesa_df['Paid In'].fillna(0,inplace=True)
-    #Filling the null details descripotion with:
+    #Filling the null details description with:
     mpesa_df['Details'].fillna("Missing Transaction Details",inplace= True)
 
     #Some Feature Engineering
