@@ -17,6 +17,7 @@ langchain_core
 langchain_experimental
 langchain_google_genai
 langchain_community
+langchain_openai
 fastapi
 uvicorn
 pydantic
