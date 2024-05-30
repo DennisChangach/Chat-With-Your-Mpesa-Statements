@@ -8,7 +8,6 @@ from langchain.chains import LLMChain
 from langchain.prompts.few_shot import FewShotPromptTemplate
 from langchain.prompts.prompt import PromptTemplate
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from src.components.few_shots import few_shots
 from src.components.prompts import in_context_prompt,generate_feedback_prompt,generate_exmp_qns_prompt
