@@ -4,6 +4,7 @@ import pandas as pd
 import PyPDF2
 import tabula
 import datetime
+import streamlit as st
 
 
 #Function for decrypting the PDF
@@ -15,9 +16,9 @@ def pdf_decrypt(pdf_password,pdf_file):
     if pdf_reader.is_encrypted:
         # Attempt to decrypt the PDF with the password
         if pdf_reader.decrypt(pdf_password):
-            print("PDF successfully decrypted.")
+            st.success("PDF successfully decrypted.")
         else:
-            print("Failed to decrypt the PDF. Please check you've uploaded your statement and entered the correct password.")
+            st.error("Failed to decrypt the PDF. Please check you've uploaded your statement and entered the correct password.")
             exit(1)
 
 #Function for parsing the pdf

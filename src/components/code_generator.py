@@ -1,8 +1,8 @@
 from langchain.prompts import PromptTemplate
 import google.generativeai as genai
 from langchain_google_genai import ChatGoogleGenerativeAI
-#from langchain_openai import OpenAI
-#from langchain_openai import ChatOpenAI
+from langchain_openai import OpenAI
+from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.prompts.few_shot import FewShotPromptTemplate
@@ -29,7 +29,7 @@ gemini_llm = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0,convert_sy
 
 #Loading openai models: GPT 3.5
 OPENAI_API_KEY= os.getenv("OPENAI_API_KEY")
-#gpt3_5_llm = ChatOpenAI(temperature=0, openai_api_key= OPENAI_API_KEY,model_name = "gpt-3.5-turbo-0125")
+gpt3_5_llm = ChatOpenAI(temperature=0, openai_api_key= OPENAI_API_KEY,model_name = "gpt-3.5-turbo-0125")
 
 #Initilializing the output parser
 output_parser = StrOutputParser()

@@ -6,7 +6,7 @@ import plotly.express as px
 import requests
 from src.components.pdf_parser import pdf_parser,pdf_decrypt
 from src.components.code_generator import get_in_context_reponse,get_generated_results_explantion,get_example_qns
-
+from PIL import Image
 #Session States
 def initialize_session_state():
     #dataframes
@@ -23,7 +23,10 @@ initialize_session_state()
 
 #Defining the main function:
 def main():
-    st.set_page_config("Chatting with Mpesa")
+    #Getting the favicon
+    im = Image.open('assets/logo.png')
+    st.logo('assets/logo.png')
+    st.set_page_config("ChatPesa",page_icon=im)
     st.title("💬 Chat with Your Mpesa Statements:📊")
 
     #Decrpyt variable
