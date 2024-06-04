@@ -14,7 +14,6 @@ from src.components.prompts import in_context_prompt,generate_feedback_prompt,ge
 from dotenv import load_dotenv
 import streamlit as st
 import os
-import uvicorn
 
 # Load environment variables
 load_dotenv()
